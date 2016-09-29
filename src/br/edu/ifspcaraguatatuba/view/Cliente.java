@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,6 +21,8 @@ public class Cliente extends JFrame {
 
 	private static final long serialVersionUID = 6294910249439867800L;
 	private JPanel contentPane;
+	
+	private Socket_Cliente client = new Socket_Cliente();
 	
 	private JLabel lblStatusServidor;
 
@@ -40,7 +43,7 @@ public class Cliente extends JFrame {
 		JTextPane textPane = new JTextPane();
 		textPane.setBounds(10, 113, 414, 104);
 		textPane.setEnabled(false);
-		textPane.setText("Faça a conexão com o servidor");
+		textPane.setText("");
 		contentPane.add(textPane);
 		
 		JLabel lblDigiteSuaMensagem = new JLabel("Digite sua mensagem:");
@@ -48,20 +51,20 @@ public class Cliente extends JFrame {
 		contentPane.add(lblDigiteSuaMensagem);
 		
 		JButton btnConectar = new JButton("Conectar");
-		btnConectar.addActionListener(new ActionListener() { // Cria conexão com o servidor
+		btnConectar.addActionListener(new ActionListener() { // Cria conexÃ£o com o servidor
 			public void actionPerformed(ActionEvent arg0) {
 				
-				String msg = textPane.getText();
-				
-				Socket_Cliente cliente = new Socket_Cliente();
 				try {
-					cliente.connect(msg);
+					client.connect();
 					
+					lblStatusServidor.setForeground(Color.green);
 					lblStatusServidor.setText("Conectado");
-					lblStatusServidor.setForeground(Color.GREEN);
+					btnEnviar.setEnabled(true);
+					btnConectar.setEnabled(false);
 					
+				} catch (UnknownHostException e) {
+					JOptionPane.showMessageDialog(contentPane, e.getMessage());
 				} catch (IOException e) {
-					e.printStackTrace();
 					JOptionPane.showMessageDialog(contentPane, e.getMessage());
 				}
 				

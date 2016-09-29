@@ -7,14 +7,22 @@ import java.net.UnknownHostException;
 
 public class Socket_Cliente {
 	
+	private Socket cliente;
 	
 	
+	public boolean connect() throws UnknownHostException, IOException {
+		
+		cliente = new Socket("127.0.0.1", 12345);
+		System.out.println("O cliente se conectou ao servidor!");
+		
+		return cliente.isConnected();
+	}
 	
 	public void connect (String msg) throws UnknownHostException, IOException {
 
 		Socket cliente = new Socket("127.0.0.1", 12345);
 
-		System.out.println("O cliente se conectou ao servidor!");
+		
 
 		PrintStream saida = new PrintStream(cliente.getOutputStream());
 
