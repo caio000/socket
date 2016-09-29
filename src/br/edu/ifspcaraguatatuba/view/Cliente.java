@@ -1,16 +1,20 @@
 package br.edu.ifspcaraguatatuba.view;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
-import javax.swing.JTextPane;
-import javax.swing.JLabel;
-import java.awt.event.ActionListener;
-import java.net.Socket;
-import java.awt.event.ActionEvent;
-import java.awt.Font;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
+
+import br.edu.ifspcaraguatatuba.socket_cliente.Socket_Cliente;
 
 public class Cliente extends JFrame {
 
@@ -47,16 +51,18 @@ public class Cliente extends JFrame {
 		btnConectar.addActionListener(new ActionListener() { // Cria conexão com o servidor
 			public void actionPerformed(ActionEvent arg0) {
 				
-				Socket cliente;
+				String msg = textPane.getText();
 				
-				try{
-					cliente = new Socket("127.0.0.1", 12345);
+				Socket_Cliente cliente = new Socket_Cliente();
+				try {
+					cliente.connect(msg);
 					
 					lblStatusServidor.setText("Conectado");
 					lblStatusServidor.setForeground(Color.GREEN);
 					
-				} catch (Exception e) {
+				} catch (IOException e) {
 					e.printStackTrace();
+					JOptionPane.showMessageDialog(contentPane, e.getMessage());
 				}
 				
 			}
