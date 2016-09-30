@@ -43,7 +43,6 @@ public class Cliente extends JFrame {
 		JButton btnEnviar = new JButton("Enviar");
 		btnEnviar.addActionListener(new ActionListener() { // BOTÃO ENVIAR
 			public void actionPerformed(ActionEvent e) {
-				// TODO implementar função para enviar mensagem ao servidor
 				try {
 					String message = textField.getText();
 					client.sendMessage(message);
@@ -68,6 +67,14 @@ public class Cliente extends JFrame {
 		btnConectar.addActionListener(new ActionListener() { // Cria conexÃ£o com o servidor
 			public void actionPerformed(ActionEvent arg0) {
 				
+				/*
+				 * FIXME não esta conectando no servidor
+				 * 
+				 * quando conecta pela primeira vez tudo funcionada corretamente, porem
+				 * quando vc desconecta e tenta conectar novamente o sistema
+				 * lança um exceção de que não é possivel conectar.
+				 */
+				
 				try {
 					client.connect();
 					
@@ -80,8 +87,10 @@ public class Cliente extends JFrame {
 					
 				} catch (UnknownHostException e) {
 					JOptionPane.showMessageDialog(contentPane, e.getMessage());
+					e.printStackTrace();
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(contentPane, e.getMessage());
+					e.printStackTrace();
 				}
 				
 			}
@@ -105,8 +114,21 @@ public class Cliente extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Implementar função para desconectar o cliente....
-				
+				try {
+					client.disconnect();
+					
+					btnDesconectar.setVisible(false);
+					btnConectar.setVisible(true);
+					btnEnviar.setEnabled(false);
+					
+					lblStatusServidor.setForeground(Color.red);
+					lblStatusServidor.setText("Desconectado");
+					
+					textField.setEnabled(false);
+					
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnDesconectar.setBounds(205, 127, 120, 23);
