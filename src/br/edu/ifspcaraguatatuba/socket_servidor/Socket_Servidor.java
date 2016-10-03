@@ -7,34 +7,32 @@ import java.util.Scanner;
 
 public class Socket_Servidor implements Runnable {
 
+	private ServerSocket servidor;
+	private Socket cliente;
+	
 	public void connect() throws IOException {
-		ServerSocket servidor = new ServerSocket(12345);
-
-		System.out.println("Porta 12345 aberta!");
-
-		Socket cliente = servidor.accept();
-
-		System.out.println("Nova conexão com o cliente " + cliente.getInetAddress().getHostAddress());
-
-		Scanner entrada = new Scanner(cliente.getInputStream());
-
-		while (entrada.hasNextLine()) {
-			System.out.println("O cliente digitou: " + entrada.nextLine());
-		}
-
-		entrada.close();
-		servidor.close();
+		servidor = new ServerSocket(12345);
+		System.err.println("Porta 12345 aberta!");
 	}
 
 	@Override
 	public void run() {
 		
+		Scanner entrada;
+		
 		try {
-			connect();
-		} catch (IOException e) {
+			
+			cliente = servidor.accept();
+			entrada = new Scanner(cliente.getInputStream());
+		
+			while (entrada.hasNextLine()) {
+				System.out.println("O cliente digitou: " + entrada.nextLine());
+			}
+			
+			entrada.close();
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
 	

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,16 +35,17 @@ public class Servidor extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				Socket_Servidor servidor = new Socket_Servidor();
-				Thread thread = new Thread(servidor);
-				
-				thread.setPriority(Thread.MAX_PRIORITY);
-				thread.start();
-				
-				String state = thread.getState().toString();
-				if (state.equals("RUNNABLE")) {
-					lblStatusServidor.setText("Conectado");
-					lblStatusServidor.setForeground(Color.GREEN);
+				try {
+					servidor.connect();
+					
 					btnConectar.setEnabled(false);
+					lblStatusServidor.setForeground(Color.green);
+					lblStatusServidor.setText("Conectado");
+					
+					Thread thread = new Thread(servidor);
+					thread.start();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 				
 			}
