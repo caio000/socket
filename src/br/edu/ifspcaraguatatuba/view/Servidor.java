@@ -38,7 +38,7 @@ public class Servidor extends JFrame {
 				
 				try {
 					
-					ServerSocket servidor = new ServerSocket(12345);
+					ServerSocket servidor = new ServerSocket(2008);
 					
 					Runnable r = new Runnable() {
 						

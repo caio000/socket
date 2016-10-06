@@ -7,33 +7,43 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.ParseException;
+import java.util.Scanner;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import br.edu.ifspcaraguatatuba.socket_cliente.Socket_Cliente;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 
 public class Cliente extends JFrame {
 
 	private static final long serialVersionUID = 6294910249439867800L;
 	private JPanel contentPane;
 	
-	private Socket_Cliente client = new Socket_Cliente("127.0.0.1", 12345);
+	private Socket_Cliente client = new Socket_Cliente("10.10.112.6", 2000);
 	
 	private JLabel lblStatusServidor;
 	private JButton btnDesconectar;
 	private JTextField textField;
+	private JTextField txtPorta;
+	private JTextField txtIp;
+	private JTextField txtPort1;
 
-	public Cliente() {
+	public Cliente() throws ParseException {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 200);
+		setBounds(100, 100, 450, 514);
 		setTitle("Cliente");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -55,15 +65,15 @@ public class Cliente extends JFrame {
 				}
 			}
 		});
-		btnEnviar.setBounds(335, 127, 89, 23);
+		btnEnviar.setBounds(335, 297, 89, 23);
 		btnEnviar.setEnabled(false);
 		contentPane.add(btnEnviar);
 		
 		JLabel lblDigiteSuaMensagem = new JLabel("Digite sua mensagem:");
-		lblDigiteSuaMensagem.setBounds(10, 71, 414, 14);
+		lblDigiteSuaMensagem.setBounds(10, 241, 414, 14);
 		contentPane.add(lblDigiteSuaMensagem);
 		
-		JButton btnConectar = new JButton("Conectar");
+		JButton btnConectar = new JButton("<html>Conectar em <br>outro usu\u00E1rio</html>");
 		btnConectar.addActionListener(new ActionListener() { // Cria conex√£o com o servidor
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -95,7 +105,7 @@ public class Cliente extends JFrame {
 				
 			}
 		});
-		btnConectar.setBounds(205, 127, 120, 23);
+		btnConectar.setBounds(304, 416, 120, 49);
 		contentPane.add(btnConectar);
 		
 		JLabel lblStatus = new JLabel("Status:");
@@ -131,12 +141,12 @@ public class Cliente extends JFrame {
 				}
 			}
 		});
-		btnDesconectar.setBounds(205, 127, 120, 23);
+		btnDesconectar.setBounds(304, 442, 120, 23);
 		btnDesconectar.setVisible(false);
 		contentPane.add(btnDesconectar);
 		
 		textField = new JTextField();
-		textField.setBounds(10, 96, 414, 20);
+		textField.setBounds(10, 266, 414, 20);
 		textField.setEnabled(false);
 		textField.addKeyListener(new KeyAdapter() {
 			@Override
@@ -147,5 +157,81 @@ public class Cliente extends JFrame {
 		});
 		contentPane.add(textField);
 		textField.setColumns(10);
+		
+		JTextArea textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setBounds(10, 71, 414, 159);
+		contentPane.add(textArea);
+		
+		txtPorta = new JTextField();
+		txtPorta.setBounds(174, 431, 89, 23);
+		contentPane.add(txtPorta);
+		txtPorta.setColumns(10);
+		
+		JLabel lblPorta = new JLabel("Porta");
+		lblPorta.setBounds(174, 416, 46, 14);
+		contentPane.add(lblPorta);
+		
+		JLabel lblIp = new JLabel("IP");
+		lblIp.setBounds(10, 416, 46, 14);
+		contentPane.add(lblIp);
+		
+		txtIp = new JTextField();
+		txtIp.setBounds(10, 432, 139, 22);
+		contentPane.add(txtIp);
+		txtIp.setColumns(10);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(10, 402, 414, 14);
+		contentPane.add(separator);
+		
+		JButton btnCriarConexo = new JButton("Criar conex\u00E3o");
+		btnCriarConexo.addActionListener(new ActionListener() { // BOT√O PARA CRIAR UMA CONEX√O
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					int port = Integer.parseInt(txtPort1.getText());
+					ServerSocket server = new ServerSocket(port);
+					
+					Runnable r = new Runnable() {
+						
+						@Override
+						public void run() {
+							
+							try{
+								Socket client = server.accept();
+								Scanner read = new Scanner (client.getInputStream());
+								
+								while (read.hasNextLine())
+									System.out.println(read.nextLine());
+							}catch (Exception e) {
+								e.printStackTrace();
+							}
+							
+						}
+					};
+					
+					Thread thread = new Thread(r);
+					thread.setPriority(Thread.MAX_PRIORITY);
+					thread.start();
+					
+					lblStatusServidor.setText("Conectado");
+					lblStatusServidor.setForeground(Color.green);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		btnCriarConexo.setBounds(304, 350, 120, 23);
+		contentPane.add(btnCriarConexo);
+		
+		txtPort1 = new JTextField();
+		txtPort1.setBounds(174, 351, 86, 20);
+		contentPane.add(txtPort1);
+		txtPort1.setColumns(10);
+		
+		JLabel lblPorta_1 = new JLabel("Porta");
+		lblPorta_1.setBounds(174, 336, 46, 14);
+		contentPane.add(lblPorta_1);
 	}
 }
