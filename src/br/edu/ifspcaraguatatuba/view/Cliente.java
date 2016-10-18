@@ -18,20 +18,23 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import br.edu.ifspcaraguatatuba.socket_cliente.Socket_Cliente;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 
 public class Cliente extends JFrame {
 
 	private static final long serialVersionUID = 6294910249439867800L;
 	private JPanel contentPane;
 	
-	private Socket_Cliente client = new Socket_Cliente("10.10.112.6", 2000);
+	private Socket_Cliente client;
+	private Socket_Cliente client2;
+	
+	private ServerSocket server;
+	private ServerSocket server2;
 	
 	private JLabel lblStatusServidor;
 	private JButton btnDesconectar;
@@ -51,7 +54,7 @@ public class Cliente extends JFrame {
 		setContentPane(contentPane);
 		
 		JButton btnEnviar = new JButton("Enviar");
-		btnEnviar.addActionListener(new ActionListener() { // BOTÃO ENVIAR
+		btnEnviar.addActionListener(new ActionListener() { // BOTï¿½O ENVIAR
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String message = textField.getText();
@@ -77,15 +80,11 @@ public class Cliente extends JFrame {
 		btnConectar.addActionListener(new ActionListener() { // Cria conexÃ£o com o servidor
 			public void actionPerformed(ActionEvent arg0) {
 				
-				/*
-				 * FIXME não esta conectando no servidor
-				 * 
-				 * quando conecta pela primeira vez tudo funcionada corretamente, porem
-				 * quando vc desconecta e tenta conectar novamente o sistema
-				 * lança um exceção de que não é possivel conectar.
-				 */
+				String IP = txtIp.getText(); 
+				int port = Integer.parseInt(txtPorta.getText());
 				
 				try {
+					client = new Socket_Cliente(IP, port);
 					client.connect();
 					
 					lblStatusServidor.setForeground(Color.green);
@@ -186,11 +185,11 @@ public class Cliente extends JFrame {
 		contentPane.add(separator);
 		
 		JButton btnCriarConexo = new JButton("Criar conex\u00E3o");
-		btnCriarConexo.addActionListener(new ActionListener() { // BOTÃO PARA CRIAR UMA CONEXÃO
+		btnCriarConexo.addActionListener(new ActionListener() { // BOTï¿½O PARA CRIAR UMA CONEXï¿½O
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					int port = Integer.parseInt(txtPort1.getText());
-					ServerSocket server = new ServerSocket(port);
+					server = new ServerSocket(port);
 					
 					Runnable r = new Runnable() {
 						
@@ -203,6 +202,8 @@ public class Cliente extends JFrame {
 								
 								while (read.hasNextLine())
 									System.out.println(read.nextLine());
+								
+								read.close();
 							}catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -216,6 +217,16 @@ public class Cliente extends JFrame {
 					
 					lblStatusServidor.setText("Conectado");
 					lblStatusServidor.setForeground(Color.green);
+					
+					btnCriarConexo.setEnabled(false);
+					txtIp.setEnabled(false);
+					txtPort1.setEnabled(false);
+					txtPorta.setEnabled(false);
+					btnConectar.setEnabled(false);
+					
+					textField.setEnabled(true);
+					btnEnviar.setEnabled(true);
+					
 					
 				} catch (Exception e) {
 					e.printStackTrace();
