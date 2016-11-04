@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -31,10 +32,8 @@ public class Cliente extends JFrame {
 	private JPanel contentPane;
 	
 	private Socket_Cliente client;
-	private Socket_Cliente client2;
 	
 	private ServerSocket server;
-	private ServerSocket server2;
 	
 	private JLabel lblStatusServidor;
 	private JButton btnDesconectar;
@@ -42,6 +41,7 @@ public class Cliente extends JFrame {
 	private JTextField txtPorta;
 	private JTextField txtIp;
 	private JTextField txtPort1;
+	private JTextArea textArea;
 
 	public Cliente() throws ParseException {
 		
@@ -58,6 +58,9 @@ public class Cliente extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String message = textField.getText();
+					String hist = textArea.getText();
+					hist += InetAddress.getLocalHost().getHostName() + "-> " + message + "\n";
+					textArea.setText(hist);
 					client.sendMessage(message);
 					
 					textField.setText(null); // limpa a caixa de texto
@@ -77,7 +80,7 @@ public class Cliente extends JFrame {
 		contentPane.add(lblDigiteSuaMensagem);
 		
 		JButton btnConectar = new JButton("<html>Conectar em <br>outro usu\u00E1rio</html>");
-		btnConectar.addActionListener(new ActionListener() { // Cria conexÃ£o com o servidor
+		btnConectar.addActionListener(new ActionListener() { // ===============================================================================> Cria conexÃ£o com o servidor
 			public void actionPerformed(ActionEvent arg0) {
 				
 				String IP = txtIp.getText(); 
@@ -85,7 +88,59 @@ public class Cliente extends JFrame {
 				
 				try {
 					client = new Socket_Cliente(IP, port);
-					client.connect();
+					if ( client.connect() ) {
+						
+						server = new ServerSocket(++port);
+						Runnable r = new Runnable() {
+							
+							@Override
+							public void run() {
+								
+								try {
+									
+									String text = "+----------------------------------------------------------------+" + "\n"
+													+ "|\t" + "Aguardando conexão" + "\t|\n" 
+													+ "|\t" + "IP: " + InetAddress.getLocalHost().getHostAddress() + "\t|\n"
+												+ "+----------------------------------------------------------------+";
+				
+									textArea.setText(text);
+									
+									Socket clientCon = server.accept();
+									
+									textArea.setText(null);
+									text = "+----------------------------------------------------------------+" + "\n"
+														+ "|\t" + "Conexão estabelecida" + "\t|\n" 
+										 + "+----------------------------------------------------------------+";
+									textArea.setText(text);
+									
+									Thread.sleep(1000);
+									textArea.setText(null);
+									
+									
+									Scanner read = new Scanner(clientCon.getInputStream());
+									
+									String msg = "";
+									while (read.hasNextLine()) {
+										msg += clientCon.getInetAddress().getHostName() + "-> " + read.nextLine() + "\n";
+										textArea.setText(msg);
+									}
+									
+									read.close();
+									server.close();
+									
+								} catch (IOException e) {
+									e.printStackTrace();
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								
+							}
+						};
+						
+						Thread thread = new Thread(r);
+						thread.setPriority(Thread.MAX_PRIORITY);
+						thread.start();
+					}
 					
 					lblStatusServidor.setForeground(Color.green);
 					lblStatusServidor.setText("Conectado");
@@ -93,6 +148,10 @@ public class Cliente extends JFrame {
 					btnConectar.setVisible(false);
 					btnDesconectar.setVisible(true);
 					textField.setEnabled(true);
+					txtPort1.setEnabled(false);
+					
+					txtIp.setEnabled(false);
+					txtPorta.setEnabled(false);
 					
 				} catch (UnknownHostException e) {
 					JOptionPane.showMessageDialog(contentPane, e.getMessage());
@@ -104,7 +163,7 @@ public class Cliente extends JFrame {
 				
 			}
 		});
-		btnConectar.setBounds(304, 416, 120, 49);
+		btnConectar.setBounds(304, 425, 120, 49);
 		contentPane.add(btnConectar);
 		
 		JLabel lblStatus = new JLabel("Status:");
@@ -119,7 +178,7 @@ public class Cliente extends JFrame {
 		contentPane.add(lblStatusServidor);
 		
 		btnDesconectar = new JButton("Desconectar");
-		btnDesconectar.addActionListener(new ActionListener() {
+		btnDesconectar.addActionListener(new ActionListener() { // ==============================================================> Botão de desconectar
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -140,7 +199,7 @@ public class Cliente extends JFrame {
 				}
 			}
 		});
-		btnDesconectar.setBounds(304, 442, 120, 23);
+		btnDesconectar.setBounds(304, 431, 120, 23);
 		btnDesconectar.setVisible(false);
 		contentPane.add(btnDesconectar);
 		
@@ -157,7 +216,7 @@ public class Cliente extends JFrame {
 		contentPane.add(textField);
 		textField.setColumns(10);
 		
-		JTextArea textArea = new JTextArea();
+		textArea = new JTextArea();
 		textArea.setEditable(false);
 		textArea.setBounds(10, 71, 414, 159);
 		contentPane.add(textArea);
@@ -185,7 +244,7 @@ public class Cliente extends JFrame {
 		contentPane.add(separator);
 		
 		JButton btnCriarConexo = new JButton("Criar conex\u00E3o");
-		btnCriarConexo.addActionListener(new ActionListener() { // BOTï¿½O PARA CRIAR UMA CONEXï¿½O
+		btnCriarConexo.addActionListener(new ActionListener() { // =====================================================================> BOTï¿½O PARA CRIAR UMA CONEXï¿½O
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					int port = Integer.parseInt(txtPort1.getText());
@@ -196,12 +255,39 @@ public class Cliente extends JFrame {
 						@Override
 						public void run() {
 							
-							try{
-								Socket client = server.accept();
-								Scanner read = new Scanner (client.getInputStream());
+							try {
 								
-								while (read.hasNextLine())
-									System.out.println(read.nextLine());
+								String text = "+----------------------------------------------------------------+" + "\n"
+															+ "|\t" + "Aguardando conexão" + "\t|\n" 
+										    + "|\t" + "IP: " + InetAddress.getLocalHost().getHostAddress() + "\t|\n"
+										    + "+----------------------------------------------------------------+";
+								
+								textArea.setText(text);
+								Socket clientCon = server.accept();
+								
+								textArea.setText(null);
+								text = "+----------------------------------------------------------------+" + "\n"
+													+ "|\t" + "Conexão estabelecida" + "\t|\n" 
+									 + "+----------------------------------------------------------------+";
+								textArea.setText(text);
+								
+								/*
+								 * Depois que o servidor aceitar a conexão com cliente
+								 * é criado um cliente para se conectar com o outro 
+								 * servidor.
+								 */
+								Thread.sleep(2000); // O sistema dorme por 2 segundos para que possa ser criado o servidor do outro lado
+								int porta = port + 1;
+								client = new Socket_Cliente(clientCon.getInetAddress().getHostAddress(), porta);
+								client.connect();
+								
+								Scanner read = new Scanner (clientCon.getInputStream());
+								
+								String msg = "";
+								while (read.hasNextLine()) {
+									msg += clientCon.getInetAddress().getHostName() + "-> " + read.nextLine() + "\n";
+									textArea.setText(msg);
+								}
 								
 								read.close();
 							}catch (Exception e) {

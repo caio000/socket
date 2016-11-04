@@ -29,10 +29,7 @@ public class Socket_Cliente {
 	 * @throws IOException
 	 */
 	public boolean connect() throws UnknownHostException, IOException {
-		
 		cliente = new Socket(this.IP, this.port);
-		System.out.println("O cliente se conectou ao servidor!");
-		
 		return cliente.isConnected();
 	}
 	
