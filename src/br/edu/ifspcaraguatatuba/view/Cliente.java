@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import br.edu.ifspcaraguatatuba.socket_cliente.Socket_Cliente;
+import javax.swing.JScrollPane;
 
 public class Cliente extends JFrame {
 
@@ -54,7 +55,7 @@ public class Cliente extends JFrame {
 		setContentPane(contentPane);
 		
 		JButton btnEnviar = new JButton("Enviar");
-		btnEnviar.addActionListener(new ActionListener() { // BOTï¿½O ENVIAR
+		btnEnviar.addActionListener(new ActionListener() { // =================================================================================> BOTï¿½O ENVIAR
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String message = textField.getText();
@@ -65,7 +66,7 @@ public class Cliente extends JFrame {
 					
 					textField.setText(null); // limpa a caixa de texto
 					textField.setCaretPosition(0);
-				}catch (Exception exception) {
+				} catch (Exception exception) {
 					exception.printStackTrace();
 					JOptionPane.showMessageDialog(contentPane, exception.getMessage());
 				}
@@ -119,8 +120,9 @@ public class Cliente extends JFrame {
 									
 									Scanner read = new Scanner(clientCon.getInputStream());
 									
-									String msg = "";
+									
 									while (read.hasNextLine()) {
+										String msg = textArea.getText();
 										msg += clientCon.getInetAddress().getHostName() + "-> " + read.nextLine() + "\n";
 										textArea.setText(msg);
 									}
@@ -216,10 +218,13 @@ public class Cliente extends JFrame {
 		contentPane.add(textField);
 		textField.setColumns(10);
 		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 71, 414, 159);
+		contentPane.add(scrollPane);
+		
 		textArea = new JTextArea();
+		scrollPane.setViewportView(textArea);
 		textArea.setEditable(false);
-		textArea.setBounds(10, 71, 414, 159);
-		contentPane.add(textArea);
 		
 		txtPorta = new JTextField();
 		txtPorta.setBounds(174, 431, 89, 23);
@@ -271,6 +276,9 @@ public class Cliente extends JFrame {
 									 + "+----------------------------------------------------------------+";
 								textArea.setText(text);
 								
+								Thread.sleep(1000);
+								textArea.setText(null);
+								
 								/*
 								 * Depois que o servidor aceitar a conexão com cliente
 								 * é criado um cliente para se conectar com o outro 
@@ -283,8 +291,9 @@ public class Cliente extends JFrame {
 								
 								Scanner read = new Scanner (clientCon.getInputStream());
 								
-								String msg = "";
+								
 								while (read.hasNextLine()) {
+									String msg = textArea.getText();
 									msg += clientCon.getInetAddress().getHostName() + "-> " + read.nextLine() + "\n";
 									textArea.setText(msg);
 								}
